@@ -9,6 +9,7 @@ BYTE_SIZE = 8
 
 def import_svd(bv: BinaryView):
     file_path = binaryninja.get_open_filename_input('SVD File')
+    if file_path is None: return
     binaryninja.log_info(f'parsing svd file... {file_path}')
     parser = svd2py.SvdParser()
     result = parser.convert(file_path)
