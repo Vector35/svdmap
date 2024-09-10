@@ -28,17 +28,6 @@ def import_svd(bv: BinaryView):
         per_base_addr: int = peripheral['baseAddress']
         per_struct = StructureBuilder.create()
 
-        per_addr_blocks = peripheral['addressBlock']
-        for addr_block in per_addr_blocks:
-            ablk_offset: int = addr_block['offset']
-            ablk_size: int = addr_block['size']
-            ablk_usage: str = addr_block['usage']
-            ablk_addr = per_base_addr + ablk_offset
-            # TODO: Protection, not used on tricore
-            bv.add_user_segment(ablk_addr, ablk_size, 0, 0, SegmentFlag.SegmentReadable | SegmentFlag.SegmentWritable)
-            bv.add_user_section(per_name, ablk_addr, ablk_size, SectionSemantics.ReadWriteDataSectionSemantics)
-            bv.memory_map.add_memory_region(per_name, ablk_addr, bytearray(ablk_size))
-
         per_registers = peripheral['registers']['register']
         for register in per_registers:
             reg_name: str = register['name']
@@ -94,6 +83,23 @@ def import_svd(bv: BinaryView):
             # Add the register to the peripheral type
             per_struct.insert(reg_addr_offset, bv.get_type_by_name(f'{per_name}_{reg_name}'), reg_name,
                               overwrite_existing=False)
+
+        # Get the peripheral memory range
+        per_size = 0
+        per_addr_blocks = peripheral['addressBlock']
+        for addr_block in per_addr_blocks:
+            ablk_offset: int = addr_block['offset']
+            ablk_size: int = addr_block['size']
+            per_size += (ablk_offset - per_size) + ablk_size
+
+        if per_size < per_struct.width:
+            binaryninja.log_warn(f"peripheral {per_name} @ {per_base_addr} size is less than struct size... adjusting size to fit struct")
+            per_size = per_struct.width
+
+        # Add entire peripheral range
+        bv.add_user_segment(per_base_addr, per_size, 0, 0, SegmentFlag.SegmentReadable | SegmentFlag.SegmentWritable)
+        bv.add_user_section(per_name, per_base_addr, per_size, SectionSemantics.ReadWriteDataSectionSemantics)
+        bv.memory_map.add_memory_region(per_name, per_base_addr, bytearray(per_size))
 
         # Add the peripheral description as a comment
         if show_comments:
