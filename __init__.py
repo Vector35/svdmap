@@ -24,7 +24,9 @@ def import_svd(bv: BinaryView):
 
     for peripheral in peripherals:
         per_name: str = peripheral['name']
-        per_desc: str = peripheral['description']
+        per_desc = None
+        if 'description' in peripheral:
+            per_desc: str = peripheral['description']
         per_base_addr: int = peripheral['baseAddress']
         per_struct = StructureBuilder.create()
 
@@ -121,7 +123,7 @@ def import_svd(bv: BinaryView):
         bv.memory_map.add_memory_region(per_name, per_base_addr, bytearray(per_size))
 
         # Add the peripheral description as a comment
-        if show_comments:
+        if show_comments and per_desc is not None:
             bv.set_comment_at(per_base_addr, per_desc)
         # Define the peripheral type and data var in the binary view.
         per_struct_ty = Type.structure_type(per_struct)
