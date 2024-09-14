@@ -28,14 +28,28 @@ def import_svd(bv: BinaryView):
         if 'description' in peripheral:
             per_desc: str = peripheral['description']
         per_base_addr: int = peripheral['baseAddress']
+        per_registers = []
+        if 'registers' in peripheral:
+            per_registers = peripheral['registers']['register']
+        per_attributes = None
+        if 'attributes' in peripheral:
+            per_attributes = peripheral['attributes']
+        if per_attributes is not None and 'derivedFrom' in per_attributes:
+            # Copy over from the derived peripheral.
+            per_derived_from_name = per_attributes['derivedFrom']
+            per_derived_from = next(p for p in peripherals if p['name'] == per_derived_from_name)
+            if per_derived_from is None:
+                binaryninja.log_error(
+                    f"peripheral {per_name} @ {per_base_addr} derives from unknown peripheral {per_derived_from_name}")
+                continue
+            peripheral['addressBlock'] = per_derived_from['addressBlock']
+            per_registers.extend(per_derived_from['registers']['register'])
+
         per_struct = StructureBuilder.create()
 
         # the registers block is an optional 0..1 field in the SVD spec. Even
         # if we don't get individual register definitions, we can create a
         # memory region for a peripheral
-        per_registers = []
-        if 'registers' in peripheral:
-            per_registers = peripheral['registers']['register']
         for register in per_registers:
             reg_name: str = register['name']
             reg_desc: str = register['description']
@@ -45,11 +59,17 @@ def import_svd(bv: BinaryView):
             reg_addr = per_base_addr + reg_addr_offset
             reg_struct = StructureBuilder.create(width=reg_size_b)
 
+            # Add the register description as a comment
+            if show_comments:
+                bv.set_comment_at(reg_addr, reg_desc.splitlines()[0])
+
+            if 'fields' not in register:
+                continue
+
             reg_fields = register['fields']['field']
             for field in reg_fields:
                 field_name: str = field['name']
-                # one of the three following field bit specifications must be
-                # provided
+                # one of the three following field bit specifications must be provided
                 if 'lsb' in field and 'msb' in field:
                     field_lsb: int = field['lsb']
                     field_msb: int = field['msb']
@@ -95,9 +115,6 @@ def import_svd(bv: BinaryView):
                         reg_struct.insert(existing_bitfield.offset, Type.union(bitfield_members))
 
             # TODO: This is displayed really poorly
-            # Add the register description as a comment
-            if show_comments:
-                bv.set_comment_at(reg_addr, reg_desc.splitlines()[0])
             # Define the register type in the binary view.
             reg_struct_ty = Type.structure_type(reg_struct)
             bv.define_user_type(f'{per_name}_{reg_name}', reg_struct_ty)
@@ -114,7 +131,8 @@ def import_svd(bv: BinaryView):
             per_size += (ablk_offset - per_size) + ablk_size
 
         if per_size < per_struct.width:
-            binaryninja.log_warn(f"peripheral {per_name} @ {per_base_addr} size is less than struct size... adjusting size to fit struct")
+            binaryninja.log_warn(
+                f"peripheral {per_name} @ {per_base_addr} size is less than struct size... adjusting size to fit struct")
             per_size = per_struct.width
 
         # Add entire peripheral range
