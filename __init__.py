@@ -41,8 +41,22 @@ def import_svd(bv: BinaryView):
             reg_fields = register['fields']['field']
             for field in reg_fields:
                 field_name: str = field['name']
-                field_lsb: int = field['lsb']
-                field_msb: int = field['msb']
+                # one of the three following field bit specifications must be
+                # provided
+                if 'lsb' in field and 'msb' in field:
+                    field_lsb: int = field['lsb']
+                    field_msb: int = field['msb']
+                elif 'bitOffset' in field:
+                    field_lsb: int = field['bitOffset']
+                    # The bitWidth field is optional
+                    if 'bitWidth' in field:
+                        field_msb: int = field['bitOffset'] + field['bitWidth'] - 1
+                    else:
+                        field_msb: int = field['bitOffset']
+                elif 'bitRange' in field:
+                    msb_str, lsb_str = field['bitRange'].split(':', 1)
+                    field_lsb: int = int(lsb_str[:-1])
+                    field_msb: int = int(msb_str[1:])
                 field_lsb_b: float = field_lsb / BYTE_SIZE
                 field_msb_b: float = field_msb / BYTE_SIZE
 
