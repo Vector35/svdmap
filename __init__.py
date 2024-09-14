@@ -28,7 +28,12 @@ def import_svd(bv: BinaryView):
         per_base_addr: int = peripheral['baseAddress']
         per_struct = StructureBuilder.create()
 
-        per_registers = peripheral['registers']['register']
+        # the registers block is an optional 0..1 field in the SVD spec. Even
+        # if we don't get individual register definitions, we can create a
+        # memory region for a peripheral
+        per_registers = []
+        if 'registers' in peripheral:
+            per_registers = peripheral['registers']['register']
         for register in per_registers:
             reg_name: str = register['name']
             reg_desc: str = register['description']
