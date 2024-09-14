@@ -63,7 +63,7 @@ def import_svd(bv: BinaryView):
             if show_comments:
                 bv.set_comment_at(reg_addr, reg_desc.splitlines()[0])
 
-            if 'fields' not in register:
+            if 'fields' not in register or 'field' not in register['fields']:
                 continue
 
             reg_fields = register['fields']['field']
