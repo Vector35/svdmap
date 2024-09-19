@@ -104,7 +104,7 @@ pyyaml = "^6.0"
 type = "git"
 url = "https://github.com/emesare/svd2py"
 reference = "HEAD"
-resolved_reference = "e86c2f1263ec940a2f29f68f7b5e3c55e79ab197"
+resolved_reference = "71cd3bda50c8e3b757c2d6e46735afc5fd0e1e0b"
 
 [metadata]
 lock-version = "2.0"

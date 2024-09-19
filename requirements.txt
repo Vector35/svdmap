@@ -1,4 +1,4 @@
 click==8.1.7 ; python_version >= "3.9" and python_version < "4.0"
 colorama==0.4.6 ; python_version >= "3.9" and python_version < "4.0" and platform_system == "Windows"
 pyyaml==6.0.2 ; python_version >= "3.9" and python_version < "4.0"
-svd2py @ git+https://github.com/emesare/svd2py@e86c2f1263ec940a2f29f68f7b5e3c55e79ab197 ; python_version >= "3.9" and python_version < "4.0"
+svd2py @ git+https://github.com/emesare/svd2py@71cd3bda50c8e3b757c2d6e46735afc5fd0e1e0b ; python_version >= "3.9" and python_version < "4.0"
