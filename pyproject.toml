@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "svdmap"
-version = "0.1.1"
+version = "0.1.5"
 description = ""
 authors = ["Vector35"]
 license = "MIT"
@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-svd2py = {git = "https://github.com/emesare/svd2py"}
+svd2py = "1.0.2"
 
 [build-system]
 requires = ["poetry-core"]
