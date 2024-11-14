@@ -52,7 +52,7 @@ def import_svd(bv: BinaryView):
         # memory region for a peripheral
         for register in per_registers:
             reg_name: str = register['name']
-            reg_desc: str = register['description']
+            reg_desc: str = register.get('description')
             reg_addr_offset: int = register['addressOffset']
             reg_size: int = register['size']
             reg_size_b = int(reg_size / BYTE_SIZE)
@@ -60,7 +60,7 @@ def import_svd(bv: BinaryView):
             reg_struct = StructureBuilder.create(width=reg_size_b)
 
             # Add the register description as a comment
-            if show_comments:
+            if show_comments and reg_desc:
                 bv.set_comment_at(reg_addr, reg_desc.splitlines()[0])
 
             if 'fields' not in register or 'field' not in register['fields']:
