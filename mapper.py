@@ -17,6 +17,7 @@ def import_svd(bv: BinaryView, file_path: str):
     device_name: str = device['name']
     binaryninja.log_info(f'parsing device... {device_name}')
     peripherals = device['peripherals']['peripheral']
+    dev_size = device['size']
 
     show_comments = Settings().get_bool("SVDMapper.enableComments")
     structure_bitfields = Settings().get_bool("SVDMapper.enableBitfieldStructuring")
@@ -46,7 +47,10 @@ def import_svd(bv: BinaryView, file_path: str):
         # if we don't get individual register definitions, we can create a
         # memory region for a peripheral
         for reg_index, register in enumerate(per_registers):
-            reg_missing: set[str] = {'name', 'addressOffset', 'size'} - set(register)
+            reg_missing: set[str] = {'name', 'addressOffset', 'size'}
+            reg_missing -= set(register)
+            if dev_size is not None:
+                reg_missing -= {'size'}
             if reg_missing:
                 binaryninja.log_warn(
                     f"peripheral {per_name} @ {per_base_addr:#x} register #{reg_index} ({register['name'] or '<no name>'}) is missing required tags: {', '.join(reg_missing)}")
@@ -55,7 +59,7 @@ def import_svd(bv: BinaryView, file_path: str):
             reg_name: str = register['name']
             reg_desc: Optional[str] = register.get('description')
             reg_addr_offset: int = register['addressOffset']
-            reg_size: int = register['size']
+            reg_size: int = register.get('size', dev_size)
             reg_size_b = int(reg_size / BYTE_SIZE)
             reg_addr = per_base_addr + reg_addr_offset
             reg_struct = StructureBuilder.create(width=reg_size_b)
