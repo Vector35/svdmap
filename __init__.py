@@ -40,7 +40,7 @@ def import_svd(bv: BinaryView):
             per_derived_from = next(p for p in peripherals if p['name'] == per_derived_from_name)
             if per_derived_from is None:
                 binaryninja.log_error(
-                    f"peripheral {per_name} @ {per_base_addr} derives from unknown peripheral {per_derived_from_name}")
+                    f"peripheral {per_name} @ {per_base_addr:#x} derives from unknown peripheral {per_derived_from_name}")
                 continue
             peripheral['addressBlock'] = per_derived_from['addressBlock']
             per_registers.extend(per_derived_from['registers']['register'])
@@ -132,7 +132,7 @@ def import_svd(bv: BinaryView):
 
         if per_size < per_struct.width:
             binaryninja.log_warn(
-                f"peripheral {per_name} @ {per_base_addr} size is less than struct size... adjusting size to fit struct")
+                f"peripheral {per_name} @ {per_base_addr:#x} size is less than struct size... adjusting size to fit struct")
             per_size = per_struct.width
 
         # Add entire peripheral range
