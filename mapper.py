@@ -47,7 +47,7 @@ def import_svd(bv: BinaryView, file_path: str):
         # memory region for a peripheral
         for register in per_registers:
             reg_name: str = register['name']
-            reg_desc: str = register.get('description')
+            reg_desc: Optional[str] = register.get('description')
             reg_addr_offset: int = register['addressOffset']
             reg_size: int = register['size']
             reg_size_b = int(reg_size / BYTE_SIZE)
