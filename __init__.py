@@ -50,7 +50,13 @@ def import_svd(bv: BinaryView):
         # the registers block is an optional 0..1 field in the SVD spec. Even
         # if we don't get individual register definitions, we can create a
         # memory region for a peripheral
-        for register in per_registers:
+        for reg_index, register in enumerate(per_registers):
+            reg_missing: set[str] = {'name', 'addressOffset', 'size'} - set(register)
+            if reg_missing:
+                binaryninja.log_warn(
+                    f"peripheral {per_name} @ {per_base_addr:#x} register #{reg_index} ({register['name'] or '<no name>'}) is missing required tags: {', '.join(reg_missing)}")
+                continue
+
             reg_name: str = register['name']
             reg_desc: str | None = register.get('description')
             reg_addr_offset: int = register['addressOffset']
