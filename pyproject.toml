@@ -9,6 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 svd2py = "1.0.2"
+black = "^24.10.0"
 
 [build-system]
 requires = ["poetry-core"]

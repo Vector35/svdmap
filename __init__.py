@@ -3,10 +3,13 @@ from binaryninja import BinaryView, Settings
 
 from mapper import import_svd
 
+
 def import_svd_command(bv: BinaryView):
-    file_path = binaryninja.get_open_filename_input('SVD File')
-    if file_path is None: return
+    file_path = binaryninja.get_open_filename_input("SVD File")
+    if file_path is None:
+        return
     import_svd(bv, file_path)
+
 
 settings = Settings()
 
@@ -25,5 +28,5 @@ settings.register_setting("SVDMapper.enableComments", comment_properties)
 binaryninja.PluginCommand.register(
     "Import SVD Info",
     "Maps SVD peripherals into the binary view as new segments",
-    import_svd_command
+    import_svd_command,
 )
