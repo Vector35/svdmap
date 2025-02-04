@@ -17,7 +17,7 @@ def import_svd(bv: BinaryView, file_path: str):
     device_name: str = device['name']
     binaryninja.log_info(f'parsing device... {device_name}')
     peripherals = device['peripherals']['peripheral']
-    dev_size = device['size']
+    dev_size = device.get('size')
 
     show_comments = Settings().get_bool("SVDMapper.enableComments")
     structure_bitfields = Settings().get_bool("SVDMapper.enableBitfieldStructuring")
