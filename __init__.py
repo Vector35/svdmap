@@ -1,7 +1,7 @@
 import binaryninja
 from binaryninja import BinaryView, Settings
 
-from mapper import import_svd
+from .mapper import import_svd
 
 def import_svd_command(bv: BinaryView):
     file_path = binaryninja.get_open_filename_input('SVD File')
