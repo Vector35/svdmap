@@ -1,3 +1,5 @@
+_As of Binary Ninja 5.0 a native SVD integration exists, you can browse that code [here](https://github.com/Vector35/binaryninja-api/tree/dev/plugins/svd)_
+
 # SVD Mapper (svdmap)
 
 Support loading SVD files into Binary Ninja.
